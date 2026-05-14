@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Ultimate Profit Tool Suite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .tool-card { display: none; }
+        .active { display: block; }
+    </style>
+</head>
+<body class="bg-slate-900 text-white font-sans">
+
+    <nav class="p-6 bg-slate-800 flex flex-wrap gap-4 justify-center border-b border-slate-700">
+        <button onclick="showTool('unscrambler')" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded">Word Unscrambler</button>
+        <button onclick="showTool('math')" class="px-4 py-2 bg-green-600 hover:bg-green-500 rounded">Math/Advanced</button>
+        <button onclick="showTool('science')" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded">Physics/Chem</button>
+        <button onclick="showTool('currency')" class="px-4 py-2 bg-yellow-600 hover:bg-yellow-500 rounded text-black font-bold">Live Currency & Crypto</button>
+        
+        <button id="connectWallet" onclick="connectMetaMask()" class="px-4 py-2 bg-orange-600 hover:bg-orange-500 rounded font-bold border-2 border-orange-400">
+            Connect MetaMask 🦊
+        </button>
+    </nav>
+
+    <main class="max-w-4xl mx-auto mt-10 p-6 bg-slate-800 rounded-xl shadow-2xl border border-slate-700">
+        
+        <section id="unscrambler" class="tool-card active">
+            <h2 class="text-2xl font-bold mb-4 text-blue-400">Word Unscrambler</h2>
+            <input id="scrambledInput" type="text" placeholder="Enter scrambled letters..." class="w-full p-3 rounded bg-slate-700 border border-slate-600 mb-4 focus:outline-none focus:border-blue-500">
+            <button onclick="unscramble()" class="w-full bg-blue-600 p-3 rounded font-bold">Unscramble</button>
+            <div id="wordResult" class="mt-4 p-4 bg-slate-900 rounded break-words min-h-[50px]"></div>
+        </section>
+
+        <section id="math" class="tool-card">
+            <h2 class="text-2xl font-bold mb-4 text-green-400">Advanced Calculator</h2>
+            <input id="mathInput" type="text" placeholder="e.g. 10 * 5 + Math.sqrt(144)" class="w-full p-3 rounded bg-slate-700 border border-slate-600 mb-4 focus:outline-none focus:border-green-500">
+            <button onclick="calculateMath()" class="w-full bg-green-600 p-3 rounded font-bold">Calculate</button>
+            <p class="mt-4 text-xl">Result: <span id="mathResult" class="font-mono text-green-400">0</span></p>
+        </section>
+
+        <section id="science" class="tool-card">
+            <h2 class="text-2xl font-bold mb-4 text-purple-400">Science Solvers</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="p-4 bg-slate-700 rounded border border-slate-600">
+                    <h3 class="font-bold border-b border-slate-500 mb-2">Physics ($F = ma$)</h3>
+                    <input id="mass" type="number" placeholder="Mass (kg)" class="w-full mb-2 p-2 bg-slate-800 rounded">
+                    <input id="accel" type="number" placeholder="Accel (m/s²)" class="w-full mb-2 p-2 bg-slate-800 rounded">
+                    <button onclick="solveForce()" class="w-full bg-purple-500 py-2 rounded font-bold">Solve Force</button>
+                </div>
+                <div class="p-4 bg-slate-700 rounded border border-slate-600">
+                    <h3 class="font-bold border-b border-slate-500 mb-2">Chemistry (Moles)</h3>
+                    <input id="grams" type="number" placeholder="Grams" class="w-full mb-2 p-2 bg-slate-800 rounded">
+                    <input id="molarMass" type="number" placeholder="Molar Mass" class="w-full mb-2 p-2 bg-slate-800 rounded">
+                    <button onclick="solveMoles()" class="w-full bg-purple-500 py-2 rounded font-bold">Solve Moles</button>
+                </div>
+            </div>
+            <p id="scienceResult" class="mt-6 text-center text-2xl text-purple-300 font-bold"></p>
+        </section>
+
+        <section id="currency" class="tool-card">
+            <h2 class="text-2xl font-bold mb-4 text-yellow-400">Live Exchange (Fiat & Crypto)</h2>
+            <div class="bg-yellow-900/20 p-4 rounded-lg mb-4 border border-yellow-700/50">
+                <p class="text-sm text-yellow-200">Note: Put your CurrencyFreaks API Key in the code to enable live rates!</p>
+            </div>
+            <input id="amount" type="number" value="1" class="w-full p-3 rounded bg-slate-700 border border-slate-600 mb-4">
+            <div class="flex gap-2">
+                <select id="from" class="flex-1 p-3 bg-slate-700 rounded text-white">
+                    <option value="USD">USD - Dollar</option>
+                    <option value="EUR">EUR - Euro</option>
+                    <option value="BTC">BTC - Bitcoin</option>
+                    <option value="ETH">ETH - Ethereum</option>
+                </select>
+                <span class="py-3 font-bold">TO</span>
+                <select id="to" class="flex-1 p-3 bg-slate-700 rounded text-white">
+                    <option value="EUR">EUR - Euro</option>
+                    <option value="USD">USD - Dollar</option>
+                    <option value="BTC">BTC - Bitcoin</option>
+                    <option value="ETH">ETH - Ethereum</option>
+                </select>
+            </div>
+            <button onclick="convertCurrency()" class="w-full bg-yellow-600 mt-4 p-3 rounded text-black font-bold uppercase tracking-wider">Get Live Rate</button>
+            <p id="currResult" class="mt-6 text-3xl text-center text-yellow-400 font-mono"></p>
+        </section>
+
+    </main>
+
+    <script>
+        // 1. TOOL SWITCHING LOGIC
+        function showTool(toolId) {
+            document.querySelectorAll('.tool-card').forEach(card => card.classList.remove('active'));
+            document.getElementById(toolId).classList.add('active');
+        }
+
+        // 2. METAMASK "MONEY" LOGIC
+        async function connectMetaMask() {
+            if (window.ethereum) {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    document.getElementById('connectWallet').innerText = "Wallet: " + accounts[0].slice(0,6) + "...";
+                    alert("Wallet Connected! You are ready to receive payments.");
+                } catch (err) {
+                    alert("Connection rejected.");
+                }
+            } else {
+                alert("Please install MetaMask extension!");
+            }
+        }
+
+        // 3. WORD UNSCRAMBLER LOGIC
+        function unscramble() {
+            let str = document.getElementById('scrambledInput').value.toLowerCase();
+            if(!str || str.length > 8) {
+                alert("Please enter 2-8 letters (longer words crash browsers!)");
+                return;
+            }
+            const getPerms = (s) => {
+                if (s.length <= 1) return [s];
+                let p = [];
+                for (let i = 0; i < s.length; i++) {
+                    let char = s[i];
+                    let rem = s.slice(0, i) + s.slice(i + 1);
+                    for (let x of getPerms(rem)) p.push(char + x);
+                }
+                return [...new Set(p)];
+            };
+            document.getElementById('wordResult').innerText = "Combinations: " + getPerms(str).slice(0, 30).join(", ");
+        }
+
+        // 4. MATH LOGIC
+        function calculateMath() {
+            try {
+                // Using eval with Caution - this allows advanced Math functions
+                const result = eval(document.getElementById('mathInput').value);
+                document.getElementById('mathResult').innerText = result;
+            } catch {
+                alert("Math error! Use format like: 5 * 5 or Math.sqrt(16)");
+            }
+        }
+
+        // 5. SCIENCE LOGIC
+        function solveForce() {
+            let m = document.getElementById('mass').value;
+            let a = document.getElementById('accel').value;
+            document.getElementById('scienceResult').innerText = `Force = ${m * a} Newtons`;
+        }
+        function solveMoles() {
+            let g = document.getElementById('grams').value;
+            let mm = document.getElementById('molarMass').value;
+            document.getElementById('scienceResult').innerText = `Moles = ${(g / mm).toFixed(4)} mol`;
+        }
+
+        // 6. LIVE CURRENCY LOGIC (Replace 'YOUR_KEY_HERE' when you have it)
+        const API_KEY = 'YOUR_KEY_HERE'; 
+
+        async function convertCurrency() {
+            const amt = document.getElementById('amount').value;
+            const from = document.getElementById('from').value;
+            const to = document.getElementById('to').value;
+            const res = document.getElementById('currResult');
+
+            if (API_KEY === 'YOUR_KEY_HERE') {
+                res.innerText = "Error: Set your API Key in the code!";
+                return;
+            }
+
+            res.innerText = "Fetching...";
+            try {
+                const response = await fetch(`https://api.currencyfreaks.com/v2.0/rates/latest?apikey=${API_KEY}`);
+                const data = await response.json();
+                const result = (amt / data.rates[from]) * data.rates[to];
+                res.innerText = `${amt} ${from} = ${result.toLocaleString(undefined, {maximumFractionDigits: 5})} ${to}`;
+            } catch (e) {
+                res.innerText = "Connection Failed.";
+            }
+        }
+    </script>
+</body>
+</html>
