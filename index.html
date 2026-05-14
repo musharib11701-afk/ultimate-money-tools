@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Logic Suite | Precision Tools</title>
+    
+    <meta name="google-site-verification" content="nj0_XRgWBZBdsWIJJ56tw0L6iC7Tbc41LoLn6ij-4zw" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        .tool-card { display: none; }
+        .active { display: block; }
+        body { background-color: #0f172a; } /* Dark Slate */
+    </style>
+</head>
+<body class="text-white font-sans">
+
+    <div class="flex justify-center py-4 bg-slate-800 border-b border-slate-700">
+        <p class="text-xs text-slate-500">Secure Ad Portal</p>
+    </div>
+
+    <nav class="p-6 bg-slate-800 flex flex-wrap gap-4 justify-center border-b border-slate-700">
+        <button onclick="showTool('unscrambler')" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded transition">Word Unscrambler</button>
+        <button onclick="showTool('math')" class="px-4 py-2 bg-green-600 hover:bg-green-500 rounded transition">Math/Advanced</button>
+        <button onclick="showTool('science')" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded transition">Physics/Chem</button>
+        <button onclick="showTool('currency')" class="px-4 py-2 bg-yellow-600 hover:bg-yellow-500 rounded text-black font-bold">Live Crypto Rates</button>
+        
+        <button id="connectWallet" onclick="connectMetaMask()" class="px-4 py-2 bg-orange-600 hover:bg-orange-500 rounded flex items-center gap-2">
+            Connect MetaMask 🦊
+        </button>
+    </nav>
+
+    <main class="max-w-4xl mx-auto p-8">
+        
+        <div id="welcome" class="text-center py-10">
+            <h1 class="text-4xl font-bold mb-4 text-blue-400">Quantum Logic Suite</h1>
+            <p class="text-slate-400">Select a high-performance utility from the menu above to begin.</p>
+        </div>
+
+        <section id="unscrambler" class="tool-card bg-slate-800 p-6 rounded-xl border border-blue-500/30">
+            <h2 class="text-2xl mb-4">Word Unscrambler</h2>
+            <input type="text" id="wordInput" placeholder="Enter scrambled letters..." class="w-full p-3 rounded bg-slate-900 border border-slate-700 mb-4">
+            <button onclick="unscramble()" class="w-full py-3 bg-blue-600 rounded font-bold">Solve Now</button>
+            <div id="wordResult" class="mt-4 text-xl text-green-400"></div>
+        </section>
+
+        <section id="currency" class="tool-card bg-slate-800 p-6 rounded-xl border border-yellow-500/30">
+            <h2 class="text-2xl mb-4 text-yellow-500">Global Market Rates</h2>
+            <div id="cryptoRates" class="space-y-2">
+                <p>Loading real-time data...</p>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Tab Switching Logic
+        function showTool(toolId) {
+            document.getElementById('welcome').style.display = 'none';
+            document.querySelectorAll('.tool-card').forEach(card => card.classList.remove('active'));
+            document.getElementById(toolId).classList.add('active');
+        }
+
+        // MetaMask Integration
+        async function connectMetaMask() {
+            if (window.ethereum) {
+                try {
+                    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                    document.getElementById('connectWallet').innerText = "Connected: " + accounts[0].slice(0,6) + "...";
+                    document.getElementById('connectWallet').classList.replace('bg-orange-600', 'bg-green-600');
+                } catch (err) {
+                    console.error("User rejected connection");
+                }
+            } else {
+                alert("Please install MetaMask to use Web3 features!");
+            }
+        }
+
+        // Simple Unscrambler Logic
+        function unscramble() {
+            const input = document.getElementById('wordInput').value;
+            document.getElementById('wordResult').innerText = "Solving algorithmic permutations for: " + input + "...";
+            // Logic for API or dictionary lookup goes here
+        }
+    </script>
+</body>
+</html>
